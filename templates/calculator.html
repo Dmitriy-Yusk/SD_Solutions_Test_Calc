@@ -1,1 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
+    <!-- Include Vue 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+
+    <title>Simple Calculator</title>
+</head>
+<body>
+
+<div id="calculatorApp" class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    Simple Calculator
+                </div>
+                <div class="card-body">
+                    <form id="calculatorForm" @submit.prevent="v1_calculate">
+                        <div class="form-group">
+                            <label for="operand1">Operand 1</label>
+                            <input v-model="operand1" type="number" step="any" class="form-control" id="operand1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="operator">Operator</label>
+                            <select v-model="operator" class="form-control" id="operator" required>
+                                <option value="+">+</option>
+                                <option value="-">-</option>
+                                <option value="*">*</option>
+                                <option value="/">/</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="operand2">Operand 2</label>
+                            <input v-model="operand2" type="number" step="any" class="form-control" id="operand2" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Calculate</button>
+                    </form>
+                    <div class="form-group mt-3">
+                        <label for="result">Result</label>
+                        <input v-model="result" :class="{ 'form-control': !error, 'is-invalid': error }" type="text" class="form-control" id="result" readonly>
+                        <div v-if="error" class="invalid-feedback">{{ error }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- Your custom JavaScript using Vue.js -->
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                v1Endpoint: '/api/v1/calculate',
+                operand1: null,
+                operand2: null,
+                operator: '+',
+                result: '',
+                error: '', // New error property to store error messages
+            };
+        },
+        methods: {
+            async v1_calculate() {
+                // Encode the operator before making the API request
+                const encodedOperator = encodeURIComponent(this.operator);
+
+                // Make API request to v1 endpoint
+                try {
+                    const response = await fetch(`${this.v1Endpoint}?operand1=${this.operand1}&operand2=${this.operand2}&operator=${encodedOperator}`);
+                    const resultData = await response.json();
+
+                    // Check for errors
+                    if (response.status !== 200) {
+                        this.error = 'An error occurred.';
+                        this.result = resultData.detail; // Clear the result in case of an error
+                    } else {
+                        this.result = resultData.result;
+                        this.error = ''; // Clear the error if there was a result
+                    }
+                } catch (error) {
+                    console.error('Error making API request:', error);
+                    this.error = 'An error occurred. Please try again.';
+                    this.result = this.error;
+                }
+            },
+        },
+    });
+
+    app.mount('#calculatorApp');
+</script>
+
+</body>
+</html>
