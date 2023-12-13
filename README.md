@@ -1,6 +1,8 @@
 Implementation
 
-Backend - FastAPI:
+Backend - Python 3.10, FastAPI.
+
+The following endpoints are available:
 - api/v1/calculate - supports Core Operations
 - api/v2/calculate - supports Additional Operations and Complex Expressions, including operations ordering, (), power, logarithm and sqrt
 - api/v3/calculate - the same calculations as in v2 but result is formatted to provide result coloring
@@ -8,10 +10,20 @@ Backend - FastAPI:
 Note: A little bit another color schema is used.
 
 Frontend - Bootstrap and Vue3.js
+
 There re two modes in the calculator:
 - Basic, where calculation for Core Operations are available, v1 endpoint is used
 - Extended, Additional Operations and Complex Expressions can be calculated.
   In this mode v2 endpoint is used if "Color result" not checked and v3 if it checked.
+
+Run tests:
+docker-compose --compatibility run --rm app pytest tests
+
+Run application:
+docker-compose up
+
+Access Calculator:
+http://localhost:8000/calculator
 
 ---------------------------------------------------------------------------------------
 Calculator Challenge
