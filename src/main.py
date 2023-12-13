@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.calculators import BasicCalculator
 from src.operations import OperatorEnum, AddOperation, SubtractOperation, MultiplyOperation, DivideOperation
+from src.formatters import SimpleCalcResultFormatter
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,10 @@ async def calculate(
         # operator: OperatorEnum = Query(..., title="Operator")
 ):
     try:
-        result = basic_calc.calculate(operand1, operand2, operator)
-        return {"result": result}
+        calc_result = basic_calc.calculate(operand1, operand2, operator)
+
+        result = SimpleCalcResultFormatter.format(calc_result)
+
+        return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
