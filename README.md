@@ -1,3 +1,19 @@
+Implementation
+
+Backend - FastAPI:
+- api/v1/calculate - supports Core Operations
+- api/v2/calculate - supports Additional Operations and Complex Expressions, including operations ordering, (), power, logarithm and sqrt
+- api/v3/calculate - the same calculations as in v2 but result is formatted to provide result coloring
+
+Note: A little bit another color schema is used.
+
+Frontend - Bootstrap and Vue3.js
+There re two modes in the calculator:
+- Basic, where calculation for Core Operations are available, v1 endpoint is used
+- Extended, Additional Operations and Complex Expressions can be calculated.
+  In this mode v2 endpoint is used if "Color result" not checked and v3 if it checked.
+
+---------------------------------------------------------------------------------------
 Calculator Challenge
 
 Overview
@@ -7,7 +23,7 @@ enhancements,
 
 Functional Requirements
 1. Core Operations: The calculator must support addition (+), subtraction (=), division (4), and multiplication [*).
-2. Client-side Input Format It tzkes en operator and Two operands as inputs.
+2. Client-side Input Format: It takes an operator and two operands as inputs.
 
 94 + 58 = 152
 
@@ -18,7 +34,7 @@ Functional Requirements
 
 Design and Implementation Standards
 1. OOP/0O0D Principles: The application should adhere to Object-Oriented Programming and Design principles
-2. Extensibility: Design the application 10 be open for extensions but closed for madifications (Open/Closed Principle]. This means the core code shouldn't need changes for future extensions.
+2. Extensibility: Design the application to be open for extensions but closed for madifications (Open/Closed Principle]. This means the core code shouldn't need changes for future extensions.
 3. Future Extensions (For Design Consideration Only):
 	- Additional Operations (e.g. exponentiation - x~y),
 	- Complex Expressions (eg. a + b — e/d + x*d).
