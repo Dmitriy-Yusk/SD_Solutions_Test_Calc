@@ -4,28 +4,40 @@
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
-    <!-- Include Vue 3 -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <title>Simple Calculator</title>
+    <!-- Include Vue 3 -->
+    <script src="https://unpkg.com/vue@3"></script>
+
+    <title>Combined Calculator</title>
 </head>
 <body>
 
 <div id="calculatorApp" class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    Simple Calculator
+                    Combined Calculator
                 </div>
                 <div class="card-body">
-                    <form id="calculatorForm" @submit.prevent="v1_calculate">
+                    <!-- Calculator Mode Toggle Buttons -->
+                    <div class="btn-group mb-3">
+                        <button @click="setMode('basic')" :class="{ 'btn-primary': mode === 'basic', 'btn-secondary': mode !== 'basic' }" class="btn">Basic Calculator</button>
+                        <button @click="setMode('extended')" :class="{ 'btn-primary': mode === 'extended', 'btn-secondary': mode !== 'extended' }" class="btn">Extended Calculator</button>
+                    </div>
+
+                    <!-- Basic Calculator Form -->
+                    <form v-if="mode === 'basic'" @submit.prevent="v1_calculate">
                         <div class="form-group">
-                            <label for="operand1">Operand 1</label>
+                            <label for="operand1">Operand 1:</label>
                             <input v-model="operand1" type="number" step="any" class="form-control" id="operand1" required>
                         </div>
                         <div class="form-group">
-                            <label for="operator">Operator</label>
+                            <label for="operator">Operator:</label>
                             <select v-model="operator" class="form-control" id="operator" required>
                                 <option value="+">+</option>
                                 <option value="-">-</option>
@@ -34,15 +46,51 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="operand2">Operand 2</label>
+                            <label for="operand2">Operand 2:</label>
                             <input v-model="operand2" type="number" step="any" class="form-control" id="operand2" required>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Calculate</button>
                     </form>
+
+                    <!-- Extended Calculator Form -->
+                    <form v-if="mode === 'extended'" @submit.prevent="v2_calculate">
+                        <div class="form-group">
+                            <label for="expression">Expression:</label>
+                            <input v-model="expression" type="text" class="form-control" id="expression" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Calculate</button>
+                    </form>
+
+                    <!-- Result Field -->
                     <div class="form-group mt-3">
-                        <label for="result">Result</label>
+                        <label for="result">Result:</label>
                         <input v-model="result" :class="{ 'form-control': !error, 'is-invalid': error }" type="text" class="form-control" id="result" readonly>
                         <div v-if="error" class="invalid-feedback">{{ error }}</div>
+                    </div>
+
+                    <!-- Supported Functions -->
+                    <div v-if="mode === 'extended'" class="form-group">
+                        <label for="supportedFunctions" class="">Supported Functions:</label>
+                        <div class="btn-group btn-block" id="supportedFunctions">
+                            <button type="button" class="btn btn-outline-secondary" disabled>log</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>sqrt</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>x^y</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>(</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>)</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>+</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>-</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>*</button>
+                            <button type="button" class="btn btn-outline-secondary" disabled>/</button>
+                        </div>
+                    </div>
+
+                    <!-- Examples Section -->
+                    <div v-if="mode === 'extended'" class="form-group">
+                        <label for="examples" class="">Examples:</label>
+                        <div class="" id="examples">
+                            <p>2 + 4/2 - 1 + 2^3 - (5 - 7)</p>
+                            <p>2 + log(8, 2) - sqrt(9)</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,22 +98,19 @@
     </div>
 </div>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-<!-- Your custom JavaScript using Vue.js -->
 <script>
     const app = Vue.createApp({
         data() {
             return {
                 v1Endpoint: '/api/v1/calculate',
+                v2Endpoint: '/api/v2/calculate',
+                mode: 'basic',
                 operand1: null,
                 operand2: null,
                 operator: '+',
+                expression: '',
                 result: '',
-                error: '', // New error property to store error messages
+                error: '',
             };
         },
         methods: {
@@ -91,6 +136,38 @@
                     this.error = 'An error occurred. Please try again.';
                     this.result = this.error;
                 }
+            },
+            async v2_calculate() {
+                // Make API request to v2 endpoint
+                try {
+                    const response = await fetch(`${this.v2Endpoint}?expression=${encodeURIComponent(this.expression)}`);
+                    const resultData = await response.json();
+
+                    // Check for errors
+                    if (response.status !== 200) {
+                        this.error = 'An error occurred.';
+                        this.result = resultData.detail; // Clear the result in case of an error
+                    } else {
+                        this.result = resultData.result;
+                        this.error = ''; // Clear the error if there was a result
+                    }
+                } catch (error) {
+                    console.error('Error making API request:', error);
+                    this.error = 'An error occurred. Please try again.';
+                    this.result = this.error;
+                }
+            },
+            setMode(newMode) {
+                this.mode = newMode;
+                this.clearFields();
+            },
+            clearFields() {
+                this.operand1 = null;
+                this.operand2 = null;
+                this.operator = '+';
+                this.expression = '';
+                this.result = '';
+                this.error = '';
             },
         },
     });

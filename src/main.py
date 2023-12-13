@@ -6,8 +6,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 from src.calculators import BasicCalculator, AdvancedCalculator, Tokenizer
-from src.operations import OperatorEnum, AddOperation, SubtractOperation, MultiplyOperation, DivideOperation
-from src.operations import LogarithmOperation, PowerOperation, SquareRootOperation
 from src.operations import get_basic_operations, get_extended_operations
 from src.formatters import SimpleCalcResultFormatter
 
@@ -30,7 +28,8 @@ advanced_calc = AdvancedCalculator(operations=extended_operations, tokenizer_cla
 
 @app.get("/calculator", response_class=HTMLResponse)
 async def calculator_page(request: Request):
-    return templates.TemplateResponse("calculator.html", {"request": request})
+    # return templates.TemplateResponse("calculator.html", {"request": request})
+    return templates.TemplateResponse("calculator3.html", {"request": request})
 
 
 @app.get("/api/v1/calculate")
