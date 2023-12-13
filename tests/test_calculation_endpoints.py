@@ -59,3 +59,33 @@ def test_calculate_division_by_zero(client: TestClient):
 
     assert response.status_code == 400
     assert response.json() == {'detail': 'Cannot divide by zero'}
+
+
+def test_calculate_basic_operations(client: TestClient):
+    params = {
+        'expression': '2+3*4/2'
+    }
+    response = client.get("/api/v2/calculate", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 8.0}
+
+
+def test_calculate_extended_operations(client: TestClient):
+    params = {
+        'expression': 'log(8, 2) + sqrt(9) + 2 ^ 3'
+    }
+    response = client.get("/api/v2/calculate", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 14.0}
+
+
+def test_calculate_all_operations(client: TestClient):
+    params = {
+        'expression': 'log(8, 2) + sqrt(9) + 2 ^ 3 - (2 - 3) - 2/1'
+    }
+    response = client.get("/api/v2/calculate", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == {"result": 13.0}

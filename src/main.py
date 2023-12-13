@@ -5,8 +5,10 @@ from fastapi.responses import Response, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-from src.calculators import BasicCalculator
+from src.calculators import BasicCalculator, AdvancedCalculator, Tokenizer
 from src.operations import OperatorEnum, AddOperation, SubtractOperation, MultiplyOperation, DivideOperation
+from src.operations import LogarithmOperation, PowerOperation, SquareRootOperation
+from src.operations import get_basic_operations, get_extended_operations
 from src.formatters import SimpleCalcResultFormatter
 
 
@@ -19,14 +21,11 @@ app.mount("/static", StaticFiles(directory=STATIC_FOLDER), name="static")
 
 templates = Jinja2Templates(directory=TEMPLATES_FOLDER)
 
-basic_operations = {
-    OperatorEnum.ADD:      AddOperation,
-    OperatorEnum.SUBTRACT: SubtractOperation,
-    OperatorEnum.MULTIPLY: MultiplyOperation,
-    OperatorEnum.DIVIDE:   DivideOperation,
-}
+basic_operations = get_basic_operations()
+extended_operations = get_extended_operations()
 
 basic_calc = BasicCalculator(operations=basic_operations)
+advanced_calc = AdvancedCalculator(operations=extended_operations, tokenizer_class=Tokenizer)
 
 
 @app.get("/calculator", response_class=HTMLResponse)
@@ -39,10 +38,23 @@ async def calculate(
         operand1: float = Query(..., title="Operand 1"),
         operand2: float = Query(..., title="Operand 2"),
         operator: str = Query(..., title="Operator"),
-        # operator: OperatorEnum = Query(..., title="Operator")
 ):
     try:
         calc_result = basic_calc.calculate(operand1, operand2, operator)
+
+        result = SimpleCalcResultFormatter.format(calc_result)
+
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/v2/calculate")
+async def calculate(
+        expression: str
+):
+    try:
+        calc_result = advanced_calc.calculate(expression)
 
         result = SimpleCalcResultFormatter.format(calc_result)
 
