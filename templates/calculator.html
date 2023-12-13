@@ -53,10 +53,14 @@
                     </form>
 
                     <!-- Extended Calculator Form -->
-                    <form v-if="mode === 'extended'" @submit.prevent="v2_calculate">
+                    <form v-if="mode === 'extended'" @submit.prevent="calculate">
                         <div class="form-group">
                             <label for="expression">Expression:</label>
                             <input v-model="expression" type="text" class="form-control" id="expression" required>
+                        </div>
+                        <div class="form-group form-check">
+                            <input v-model="colorResult" type="checkbox" class="form-check-input" id="colorResult">
+                            <label class="form-check-label" for="colorResult">Color result</label>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Calculate</button>
                     </form>
@@ -64,7 +68,7 @@
                     <!-- Result Field -->
                     <div class="form-group mt-3">
                         <label for="result">Result:</label>
-                        <input v-model="result" :class="{ 'form-control': !error, 'is-invalid': error }" type="text" class="form-control" id="result" readonly>
+                        <input v-model="result" :style="{ color: colorResult ? color : 'black' }" :class="{ 'form-control': !error, 'is-invalid': error }" type="text" class="form-control" id="result" readonly>
                         <div v-if="error" class="invalid-feedback">{{ error }}</div>
                     </div>
 
@@ -104,6 +108,7 @@
             return {
                 v1Endpoint: '/api/v1/calculate',
                 v2Endpoint: '/api/v2/calculate',
+                v3Endpoint: '/api/v3/calculate',
                 mode: 'basic',
                 operand1: null,
                 operand2: null,
@@ -111,6 +116,8 @@
                 expression: '',
                 result: '',
                 error: '',
+                colorResult: false,
+                color: '',
             };
         },
         methods: {
@@ -127,6 +134,7 @@
                     if (response.status !== 200) {
                         this.error = 'An error occurred.';
                         this.result = resultData.detail; // Clear the result in case of an error
+                        this.color = 'red';
                     } else {
                         this.result = resultData.result;
                         this.error = ''; // Clear the error if there was a result
@@ -135,6 +143,7 @@
                     console.error('Error making API request:', error);
                     this.error = 'An error occurred. Please try again.';
                     this.result = this.error;
+                    this.color = 'red';
                 }
             },
             async v2_calculate() {
@@ -147,15 +156,47 @@
                     if (response.status !== 200) {
                         this.error = 'An error occurred.';
                         this.result = resultData.detail; // Clear the result in case of an error
+                        this.color = 'red';
                     } else {
                         this.result = resultData.result;
                         this.error = ''; // Clear the error if there was a result
+                        this.color = '';
                     }
                 } catch (error) {
                     console.error('Error making API request:', error);
                     this.error = 'An error occurred. Please try again.';
                     this.result = this.error;
+                    this.color = 'red';
                 }
+            },
+            async v3_calculate() {
+                // Make API request to v2 endpoint
+                try {
+                    const response = await fetch(`${this.v3Endpoint}?expression=${encodeURIComponent(this.expression)}`);
+                    const resultData = await response.json();
+
+                    // Check for errors
+                    if (response.status !== 200) {
+                        this.error = 'An error occurred.';
+                        this.result = resultData.detail;
+                        this.color = 'red';
+                    } else {
+                        this.result = resultData.result;
+                        this.error = '';
+                        this.color = resultData.color;
+                    }
+                } catch (error) {
+                    console.error('Error making API request:', error);
+                    this.error = 'An error occurred. Please try again.';
+                    this.result = this.error;
+                    this.color = 'red';
+                }
+            },
+            async calculate() {
+                if (this.colorResult === true) {
+                    return this.v3_calculate()
+                }
+                return this.v2_calculate()
             },
             setMode(newMode) {
                 this.mode = newMode;
@@ -168,6 +209,8 @@
                 this.expression = '';
                 this.result = '';
                 this.error = '';
+                this.colorResult = false;
+                this.color = '';
             },
         },
     });

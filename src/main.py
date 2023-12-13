@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.calculators import BasicCalculator, AdvancedCalculator, Tokenizer
 from src.operations import get_basic_operations, get_extended_operations
-from src.formatters import SimpleCalcResultFormatter
+from src.formatters import SimpleCalcResultFormatter, ColorCalcResultFormatter
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,8 +28,7 @@ advanced_calc = AdvancedCalculator(operations=extended_operations, tokenizer_cla
 
 @app.get("/calculator", response_class=HTMLResponse)
 async def calculator_page(request: Request):
-    # return templates.TemplateResponse("calculator.html", {"request": request})
-    return templates.TemplateResponse("calculator3.html", {"request": request})
+    return templates.TemplateResponse("calculator.html", {"request": request})
 
 
 @app.get("/api/v1/calculate")
@@ -56,6 +55,20 @@ async def calculate(
         calc_result = advanced_calc.calculate(expression)
 
         result = SimpleCalcResultFormatter.format(calc_result)
+
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/v3/calculate")
+async def calculate(
+        expression: str
+):
+    try:
+        calc_result = advanced_calc.calculate(expression)
+
+        result = ColorCalcResultFormatter.format(calc_result)
 
         return result
     except ValueError as e:

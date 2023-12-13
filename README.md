@@ -25,6 +25,7 @@ Design and Implementation Standards
 	- Varied Result Formats:
 		- Simple Numeric Result (e.g. {result:5}).
 		- Numeric Result with Calor Coding (e.g. {result:5, color:'red'} ). Color determination is based on the result number's parity (even: green, odd: red).
+		Warning - I changed the coloring, RED is used for errors, like division by zero. For EVEN I use PURPLE, for ODD - BLUE
 	- The design should account for these potential extensions without implementing them at this stage.
 
 Bonus Challenge: Implement an algorithm that organizes the operators and operands in a specific order.
