@@ -37,6 +37,15 @@ def test_calculate_multiplication(client: TestClient):
     assert response.json() == {'result': 6}
 
 
+def test_calculate_multiplication_no_one_operand(client: TestClient):
+    params = {
+        'operand1': 2,
+        'operator': OperatorEnum.MULTIPLY.value
+    }
+    response = client.get('/api/v1/calculate', params=params)
+    assert response.status_code == 422
+
+
 def test_calculate_division(client: TestClient):
     params = {
         'operand1': 6,
@@ -65,27 +74,36 @@ def test_calculate_basic_operations(client: TestClient):
     params = {
         'expression': '2+3*4/2'
     }
-    response = client.get("/api/v2/calculate", params=params)
+    response = client.get('/api/v2/calculate', params=params)
 
     assert response.status_code == 200
-    assert response.json() == {"result": 8.0}
+    assert response.json() == {'result': 8.0}
 
 
 def test_calculate_extended_operations(client: TestClient):
     params = {
         'expression': 'log(8, 2) + sqrt(9) + 2 ^ 3'
     }
-    response = client.get("/api/v2/calculate", params=params)
+    response = client.get('/api/v2/calculate', params=params)
 
     assert response.status_code == 200
-    assert response.json() == {"result": 14.0}
+    assert response.json() == {'result': 14.0}
 
 
 def test_calculate_all_operations(client: TestClient):
     params = {
         'expression': 'log(8, 2) + sqrt(9) + 2 ^ 3 - (2 - 3) - 2/1'
     }
-    response = client.get("/api/v2/calculate", params=params)
+    response = client.get('/api/v2/calculate', params=params)
 
     assert response.status_code == 200
-    assert response.json() == {"result": 13.0}
+    assert response.json() == {'result': 13.0}
+
+
+def test_calculate_empty_expression(client: TestClient):
+    params = {
+        'expression': ''
+    }
+    response = client.get('/api/v2/calculate', params=params)
+
+    assert response.status_code == 400

@@ -59,6 +59,8 @@ async def calculate(
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IndexError as e:
+        raise HTTPException(status_code=400, detail=str('Not enough operands'))
 
 
 @app.get("/api/v3/calculate")
@@ -73,3 +75,5 @@ async def calculate(
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IndexError as e:
+        raise HTTPException(status_code=400, detail=str('Not enough operands'))

@@ -23,6 +23,10 @@ class Tokenizer:
         tokens = re.findall(pattern, expression)
 
         tokens = [token for token in tokens if token != ',']
+
+        if len(tokens) < 1:
+            raise ValueError(f'Nothing to calculate in expression: {expression}')
+
         return tokens
 
 
