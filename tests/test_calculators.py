@@ -146,5 +146,46 @@ def test_calculate():
 
     assert calculator.calculate('2 ^ 3 + sqrt(9)') == 11
 
+    assert calculator.calculate('4 + 6/sqrt(9) - 5') == 1
+
+    assert calculator.calculate('1 + (2 - (3 * 4))') == -9
+
     # Test complex expression
     assert calculator.calculate('2 + 3 * (4 - 2) / sqrt(9)') == 4
+
+
+def test_calculate_negative_scenarios():
+    operations = get_extended_operations()
+    calculator = AdvancedCalculator(operations, tokenizer_class=Tokenizer)
+
+    try:
+        assert calculator.calculate('2 + + 3') == 5
+    except IndexError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('2 /') == 5
+    except IndexError as ex:
+        pass
+
+    try:
+        assert calculator.calculate(' /2') == 5
+    except IndexError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('sqrt') == 5
+    except IndexError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('sqrt(') == 5
+    except ValueError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('sqrt(1') == 5
+    except ValueError as ex:
+        pass
+
+    assert True
