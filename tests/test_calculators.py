@@ -188,4 +188,19 @@ def test_calculate_negative_scenarios():
     except ValueError as ex:
         pass
 
+    try:
+        assert calculator.calculate('2 _ 3') == 5
+    except ValueError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('2 > 3') == 5
+    except ValueError as ex:
+        pass
+
+    try:
+        assert calculator.calculate('> 2 <') == 2
+    except ValueError as ex:
+        pass
+
     assert True

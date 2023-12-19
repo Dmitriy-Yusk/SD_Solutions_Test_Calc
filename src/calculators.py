@@ -19,11 +19,8 @@ class BasicCalculator:
 class Tokenizer:
     @staticmethod
     def tokenize(expression: str):
-        # pattern = re.compile(r'\d*\.?\d+|[()+\-*/^,]|(?:log|sqrt)(?=\()|\w')
         pattern = re.compile(r'\d*\.?\d+|[()+\-*/^]|(?:log|sqrt)')
         tokens = re.findall(pattern, expression)
-
-        # tokens = [token for token in tokens if token != ',']
 
         if len(tokens) < 1:
             raise ValueError(f'Nothing to calculate in expression: {expression}')
@@ -54,6 +51,9 @@ class AdvancedCalculator:
                 operator_stack.append(token)
             else:
                 operand_stack.append(float(token))
+
+        if len(operator_stack) < 1 < len(operand_stack):
+            raise ValueError("Invalid operator")
 
         while operator_stack:
             self._apply_operator(operand_stack, operator_stack, self._operations)
